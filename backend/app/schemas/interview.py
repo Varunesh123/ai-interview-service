@@ -19,3 +19,6 @@ class InterviewCreateRequest(BaseModel):
     candidate_name: str
     topic: str
     difficulty: str = "medium"
+    
+class AnswerSubmission(BaseModel):
+    answer: str

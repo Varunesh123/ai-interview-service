@@ -24,3 +24,16 @@ class InterviewSessionService:
         db.refresh(interview)
 
         return interview
+    
+    def get_interview(
+        self,
+        db: Session,
+        interview_id: int,
+    ) -> Interview | None:
+
+        interview = db.get(Interview, interview_id)
+
+        if not interview:
+            raise HTTPException(status_code=404, detail="Interview not found")
+
+        return interview
