@@ -14,3 +14,8 @@ class Evaluation(BaseModel):
     weaknesses: list[str]
     missing_concepts: list[str]
     follow_up_question: str
+    
+class InterviewCreateRequest(BaseModel):
+    candidate_name: str
+    topic: str
+    difficulty: str = "medium"

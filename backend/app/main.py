@@ -1,10 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.services.interview_service import InterviewService
 from app.services.evaluation_service import EvaluationService
-from app.schemas.interview import QuestionRequest, AnswerRequest
+from app.schemas.interview import QuestionRequest, AnswerRequest, InterviewCreateRequest
+from app.db.database import get_db
+from app.services.interview_session_service import (
+    InterviewSessionService,
+)
 
 
 app = FastAPI(
@@ -14,6 +19,7 @@ app = FastAPI(
 
 interview_service = InterviewService()
 evaluation_service = EvaluationService()
+interview_session_service = InterviewSessionService()
 
 @app.get("/")
 async def home():
@@ -50,3 +56,24 @@ async def evaluate_answer(request: AnswerRequest):
     )
 
     return evaluation
+
+@app.post("/interviews")
+async def create_interview(
+    request: InterviewCreateRequest,
+    db: Session = Depends(get_db),
+):
+
+    interview = interview_session_service.create_interview(
+        db=db,
+        candidate_name=request.candidate_name,
+        topic=request.topic,
+        difficulty=request.difficulty,
+    )
+
+    return {
+        "id": interview.id,
+        "candidate_name": interview.candidate_name,
+        "topic": interview.topic,
+        "difficulty": interview.difficulty,
+        "status": interview.status,
+    }

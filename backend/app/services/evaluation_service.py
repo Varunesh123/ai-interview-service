@@ -2,7 +2,7 @@ import json
 
 from app.ai.hf_client import HuggingFaceClient
 from app.schemas.interview import Evaluation
-
+from app.ai.parser import parse_evaluation
 
 class EvaluationService:
 
@@ -59,6 +59,4 @@ Rules:
 
         raw_response = self.llm.generate(prompt)
 
-        data = json.loads(raw_response)
-
-        return Evaluation(**data)
+        return parse_evaluation(raw_response)
