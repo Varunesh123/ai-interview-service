@@ -20,7 +20,7 @@ class HuggingFaceClient:
                     "content": prompt,
                 }
             ],
-            max_tokens=300,
+            max_tokens=500,
         )
 
         return response.choices[0].message.content

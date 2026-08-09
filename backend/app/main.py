@@ -3,6 +3,8 @@ from pydantic import BaseModel
 
 from app.config import settings
 from app.services.interview_service import InterviewService
+from app.services.evaluation_service import EvaluationService
+from app.schemas.interview import QuestionRequest, AnswerRequest
 
 
 app = FastAPI(
@@ -11,11 +13,13 @@ app = FastAPI(
 )
 
 interview_service = InterviewService()
+evaluation_service = EvaluationService()
 
-
-class QuestionRequest(BaseModel):
-    topic: str
-
+@app.get("/")
+async def home():
+    return {
+        "Home": "Welcome to the Interview API",
+    }
 
 @app.get("/health")
 async def health_check():
@@ -36,3 +40,13 @@ async def generate_question(request: QuestionRequest):
         "topic": request.topic,
         "question": question,
     }
+    
+@app.post("/interview/evaluate")
+async def evaluate_answer(request: AnswerRequest):
+
+    evaluation = evaluation_service.evaluate(
+        question=request.question,
+        answer=request.answer,
+    )
+
+    return evaluation
