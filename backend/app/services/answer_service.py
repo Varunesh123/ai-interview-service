@@ -5,12 +5,18 @@ from sqlalchemy.orm import Session
 from app.ai.hf_client import HuggingFaceClient
 from app.db.models import Answer, Question
 from app.schemas.interview import Evaluation
+from app.services.adaptive_question_service import (
+    AdaptiveQuestionService,
+)
 
 
 class AnswerService:
 
     def __init__(self):
         self.llm = HuggingFaceClient()
+        self.question_service = (
+            AdaptiveQuestionService()
+        )
 
     def submit_answer(
         self,
@@ -39,8 +45,18 @@ class AnswerService:
         db.add(answer)
         db.commit()
         db.refresh(answer)
+        
+        interview = question.interview
 
-        return answer
+        next_question = (
+            self.question_service
+            .generate_next_question(
+                db=db,
+                interview=interview,
+            )
+        )
+
+        return answer, next_question
 
     def _evaluate(
         self,

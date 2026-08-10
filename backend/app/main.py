@@ -145,19 +145,31 @@ async def submit_answer(
             detail="Question not found",
         )
 
-    answer = answer_service.submit_answer(
-        db=db,
-        question=question,
-        answer_text=request.answer,
+    answer, next_question = (
+        answer_service.submit_answer(
+            db=db,
+            question=question,
+            answer_text=request.answer,
+        )
     )
 
     return {
-        "question_id": question.id,
-        "score": answer.score,
-        "strengths": json.loads(answer.strengths),
-        "weaknesses": json.loads(answer.weaknesses),
-        "missing_concepts": json.loads(
-            answer.missing_concepts
-        ),
-        "follow_up_question": answer.follow_up_question,
+        "evaluation": {
+            "score": answer.score,
+            "strengths": json.loads(
+                answer.strengths
+            ),
+            "weaknesses": json.loads(
+                answer.weaknesses
+            ),
+            "missing_concepts": json.loads(
+                answer.missing_concepts
+            ),
+        },
+
+        "next_question": {
+            "id": next_question.id,
+            "sequence": next_question.sequence,
+            "question": next_question.question,
+        },
     }
